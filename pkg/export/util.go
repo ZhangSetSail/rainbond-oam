@@ -118,6 +118,10 @@ func pullImage(ctr ContainerdAPI, component *v1alpha1.Component, log *logrus.Log
 		Tracker: docker.NewInMemoryTracker(),
 		Hosts:   config.ConfigureHosts(ctr.CCtx, hostOpt),
 	}
+	hostOpt.Credentials = func(host string) (string, string, error) {
+		return component.AppImage.HubUser, component.AppImage.HubPassword, nil
+	}
+
 	pullOpts := []containerd.RemoteOpt{
 		containerd.WithPullUnpack,
 		containerd.WithResolver(docker.NewResolver(options)),
