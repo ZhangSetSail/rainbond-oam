@@ -114,14 +114,14 @@ func pullImage(ctr ContainerdAPI, component *v1alpha1.Component, log *logrus.Log
 
 	hostOpt := config.HostOptions{}
 	hostOpt.DefaultTLS = defaultTLS
-	options := docker.ResolverOptions{
-		Tracker: docker.NewInMemoryTracker(),
-		Hosts:   config.ConfigureHosts(ctr.CCtx, hostOpt),
-	}
 	log.Infof("账号%v，密码%v", component.AppImage.HubUser, component.AppImage.HubPassword)
 	hostOpt.Credentials = func(host string) (string, string, error) {
 		log.Infof("账号%v，密码%v", component.AppImage.HubUser, component.AppImage.HubPassword)
 		return component.AppImage.HubUser, component.AppImage.HubPassword, nil
+	}
+	options := docker.ResolverOptions{
+		Tracker: docker.NewInMemoryTracker(),
+		Hosts:   config.ConfigureHosts(ctr.CCtx, hostOpt),
 	}
 
 	pullOpts := []containerd.RemoteOpt{
