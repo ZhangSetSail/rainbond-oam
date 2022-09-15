@@ -19,9 +19,15 @@
 package export
 
 import (
+	"crypto/tls"
 	"fmt"
 	"github.com/containerd/containerd"
 	"github.com/containerd/containerd/images/archive"
+	"github.com/containerd/containerd/remotes/docker"
+	"github.com/containerd/containerd/remotes/docker/config"
+	"github.com/goodrain/rainbond-oam/pkg/ram/v1alpha1"
+	"github.com/mozillazg/go-pinyin"
+	"github.com/sirupsen/logrus"
 	"io"
 	"io/ioutil"
 	"os"
@@ -30,10 +36,6 @@ import (
 	"strconv"
 	"strings"
 	"unicode"
-
-	"github.com/goodrain/rainbond-oam/pkg/ram/v1alpha1"
-	"github.com/mozillazg/go-pinyin"
-	"github.com/sirupsen/logrus"
 )
 
 // [a-zA-Z0-9._-]
@@ -106,7 +108,21 @@ func saveImage(ctr ContainerdAPI, w io.Writer, ImageNames []string) error {
 func pullImage(ctr ContainerdAPI, component *v1alpha1.Component, log *logrus.Logger) (string, error) {
 	// docker pull image-name
 	//_, err := docker.ImagePull(client, component.ShareImage, component.AppImage.HubUser, component.AppImage.HubPassword, 30)
-	_, err := ctr.ContainerdClient.Pull(ctr.CCtx, component.ShareImage, containerd.WithPullUnpack)
+	defaultTLS := &tls.Config{
+		InsecureSkipVerify: true,
+	}
+
+	hostOpt := config.HostOptions{}
+	hostOpt.DefaultTLS = defaultTLS
+	options := docker.ResolverOptions{
+		Tracker: docker.NewInMemoryTracker(),
+		Hosts:   config.ConfigureHosts(ctr.CCtx, hostOpt),
+	}
+	pullOpts := []containerd.RemoteOpt{
+		containerd.WithPullUnpack,
+		containerd.WithResolver(docker.NewResolver(options)),
+	}
+	_, err := ctr.ContainerdClient.Pull(ctr.CCtx, component.ShareImage, pullOpts...)
 	if err != nil {
 		log.Errorf("plugin image %s by user %s failure %s", component.ShareImage, component.AppImage.HubUser, err.Error())
 		return "", err
