@@ -20,6 +20,9 @@ package export
 
 import (
 	"fmt"
+	"github.com/containerd/containerd"
+	"github.com/containerd/containerd/images/archive"
+	"io"
 	"io/ioutil"
 	"os"
 	"path"
@@ -28,9 +31,7 @@ import (
 	"strings"
 	"unicode"
 
-	"github.com/docker/docker/client"
 	"github.com/goodrain/rainbond-oam/pkg/ram/v1alpha1"
-	"github.com/goodrain/rainbond-oam/pkg/util/docker"
 	"github.com/mozillazg/go-pinyin"
 	"github.com/sirupsen/logrus"
 )
@@ -90,10 +91,22 @@ func unicode2zh(uText string) (context string) {
 
 	return context
 }
+func saveImage(ctr ContainerdAPI, w io.Writer, ImageNames []string) error {
+	var exportOpts []archive.ExportOpt
+	for _, imageName := range ImageNames {
+		exportOpts = append(exportOpts, archive.WithImage(ctr.ImageService, imageName))
+	}
+	err := ctr.ContainerdClient.Export(ctr.CCtx, w, exportOpts...)
+	if err != nil {
+		return err
+	}
+	return nil
+}
 
-func pullImage(client *client.Client, component *v1alpha1.Component, log *logrus.Logger) (string, error) {
+func pullImage(ctr ContainerdAPI, component *v1alpha1.Component, log *logrus.Logger) (string, error) {
 	// docker pull image-name
-	_, err := docker.ImagePull(client, component.ShareImage, component.AppImage.HubUser, component.AppImage.HubPassword, 30)
+	//_, err := docker.ImagePull(client, component.ShareImage, component.AppImage.HubUser, component.AppImage.HubPassword, 30)
+	_, err := ctr.ContainerdClient.Pull(ctr.CCtx, component.ShareImage, containerd.WithPullUnpack)
 	if err != nil {
 		log.Errorf("plugin image %s by user %s failure %s", component.ShareImage, component.AppImage.HubUser, err.Error())
 		return "", err
@@ -101,9 +114,10 @@ func pullImage(client *client.Client, component *v1alpha1.Component, log *logrus
 	return component.ShareImage, nil
 }
 
-func pullPluginImage(client *client.Client, plugin *v1alpha1.Plugin, log *logrus.Logger) (string, error) {
+func pullPluginImage(ctr ContainerdAPI, plugin *v1alpha1.Plugin, log *logrus.Logger) (string, error) {
 	// docker pull image-name
-	_, err := docker.ImagePull(client, plugin.ShareImage, plugin.PluginImage.HubUser, plugin.PluginImage.HubPassword, 30)
+	//_, err := docker.ImagePull(client, plugin.ShareImage, plugin.PluginImage.HubUser, plugin.PluginImage.HubPassword, 30)
+	_, err := ctr.ContainerdClient.Pull(ctr.CCtx, plugin.ShareImage, containerd.WithPullUnpack)
 	if err != nil {
 		log.Errorf("plugin image %s by user %s failure %s", plugin.ShareImage, plugin.PluginImage.HubUser, err.Error())
 		return "", err
