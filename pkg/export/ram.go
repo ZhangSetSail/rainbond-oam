@@ -121,7 +121,7 @@ func (r *ramExporter) savePlugins() error {
 	start := time.Now()
 	//ctx := context.Background()
 	//err := docker.MultiImageSave(ctx, r.client, fmt.Sprintf("%s/plugins-images.tar", r.exportPath), pluginImageNames...)
-	w, err := os.Create(fmt.Sprintf("%s/component-images.tar", r.exportPath))
+	w, err := os.Create(fmt.Sprintf("%s/plugins-images.tar", r.exportPath))
 	if err != nil {
 		logrus.Errorf("Failed to create file(%v) : %s", pluginImageNames, err)
 		return err
