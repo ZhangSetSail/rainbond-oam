@@ -94,6 +94,8 @@ func unicode2zh(uText string) (context string) {
 	return context
 }
 func saveImage(ctr ContainerdAPI, w io.Writer, ImageNames []string) error {
+	logrus.Infof("---------------------打包镜像----------------------")
+	logrus.Infof("%v", ImageNames)
 	var exportOpts []archive.ExportOpt
 	for _, imageName := range ImageNames {
 		exportOpts = append(exportOpts, archive.WithImage(ctr.ImageService, imageName))

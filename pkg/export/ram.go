@@ -21,7 +21,6 @@ package export
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/containerd/containerd/images/archive"
 	"io/ioutil"
 	"os"
 	"os/exec"
@@ -128,11 +127,7 @@ func (r *ramExporter) savePlugins() error {
 		return err
 	}
 	defer w.Close()
-	var exportOpts []archive.ExportOpt
-	for _, imageName := range pluginImageNames {
-		exportOpts = append(exportOpts, archive.WithImage(r.ctr.ImageService, imageName))
-	}
-	err = r.ctr.ContainerdClient.Export(r.ctr.CCtx, w, exportOpts...)
+	err = saveImage(r.ctr, w, pluginImageNames)
 	if err != nil {
 		logrus.Errorf("Failed to save image(%v) : %s", pluginImageNames, err)
 		return err
