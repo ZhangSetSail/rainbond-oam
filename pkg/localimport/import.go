@@ -162,12 +162,8 @@ func (r *ramImport) Import(filePath string, hubInfo v1alpha1.ImageInfo) (*v1alph
 			Hosts:   config.ConfigureHosts(r.ctr.CCtx, hostOpt),
 		}
 
-		pushOpts := []containerd.RemoteOpt{
-			containerd.WithPullUnpack,
-			containerd.WithResolver(docker2.NewResolver(options)),
-		}
 		r.logger.Infof("-----------------2-----------------")
-		err = r.ctr.ContainerdClient.Push(r.ctr.CCtx, image.Name, ocispec.Descriptor{}, pushOpts...)
+		err = r.ctr.ContainerdClient.Push(r.ctr.CCtx, image.Name, ocispec.Descriptor{}, containerd.WithResolver(docker2.NewResolver(options)))
 		if err != nil {
 			return nil, err
 		}
@@ -217,12 +213,8 @@ func (r *ramImport) Import(filePath string, hubInfo v1alpha1.ImageInfo) (*v1alph
 			Hosts:   config.ConfigureHosts(r.ctr.CCtx, hostOpt),
 		}
 
-		pushOpts := []containerd.RemoteOpt{
-			containerd.WithPullUnpack,
-			containerd.WithResolver(docker2.NewResolver(options)),
-		}
 		r.logger.Infof("-----------------4-----------------")
-		err = r.ctr.ContainerdClient.Push(r.ctr.CCtx, image.Name, ocispec.Descriptor{}, pushOpts...)
+		err = r.ctr.ContainerdClient.Push(r.ctr.CCtx, image.Name, ocispec.Descriptor{}, containerd.WithResolver(docker2.NewResolver(options)))
 		if err != nil {
 			return nil, err
 		}
