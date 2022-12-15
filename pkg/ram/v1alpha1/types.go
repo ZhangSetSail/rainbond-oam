@@ -48,6 +48,7 @@ type RainbondApplicationConfig struct {
 	Annotations        map[string]string    `json:"annotations,omitempty"`
 	K8sResources       []*K8sResource       `json:"k8s_resources,omitempty"`
 	GovernanceMode     string               `json:"governance_mode" default:"BUILD_IN_SERVICE_MESH"`
+	HelmChart          map[string]string    `json:"helm_chart,omitempty"`
 }
 
 // K8sResource The running environment of an application mainly refers to the k8s resources created under the application
@@ -114,6 +115,12 @@ var StatelessMultipleDeployType DeployType = "stateless_multiple"
 
 //StateMultipleDeployType -
 var StateMultipleDeployType DeployType = "state_multiple"
+
+//Job -
+var Job DeployType = "job"
+
+//CronJob -
+var CronJob DeployType = "cronjob"
 
 //StateSingletonDeployType state
 var StateSingletonDeployType DeployType = "state_singleton"
