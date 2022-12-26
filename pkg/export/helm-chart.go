@@ -109,7 +109,7 @@ func (h *helmChartExporter) writeTemplateYaml(helmChartPath string) error {
 		unstructuredObject.SetResourceVersion("")
 		unstructuredObject.SetCreationTimestamp(metav1.Time{})
 		unstructuredObject.SetUID("")
-		unstructuredYaml, err := yaml.Marshal(unstructuredObject)
+		unstructuredYaml, err := yaml.Marshal(&unstructuredObject)
 		if err != nil {
 			return err
 		}
@@ -129,7 +129,7 @@ func CheckFileExist(fileName string) bool {
 func (h *helmChartExporter) write(helmChartFilePath string, meta []byte) error {
 	var fl *os.File
 	var err error
-	if CheckFileExist(helmChartFilePath) {
+	if exist := CheckFileExist(helmChartFilePath); exist {
 		fl, err = os.OpenFile(helmChartFilePath, os.O_APPEND|os.O_WRONLY, 0755)
 		if err != nil {
 			return err
