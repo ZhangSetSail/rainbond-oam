@@ -64,11 +64,13 @@ func (r *ramImport) Import(filePath string, hubInfo v1alpha1.ImageInfo) (*v1alph
 	if hubInfo.HubURL == "" {
 		return nil, fmt.Errorf("must define hub url")
 	}
+	logrus.Infof("111111111111111")
 	r.logger.Infof("start import app by app file %s", filePath)
 	if err := export.PrepareExportDir(r.homeDir); err != nil {
 		r.logger.Errorf("prepare import dir failure %s", err.Error())
 		return nil, err
 	}
+	logrus.Infof("2222222222222")
 	ext := path.Ext(filePath)
 	if ext == ".zip" {
 		if err := util.Unzip(filePath, r.homeDir); err != nil {
@@ -81,32 +83,38 @@ func (r *ramImport) Import(filePath string, hubInfo v1alpha1.ImageInfo) (*v1alph
 			return nil, err
 		}
 	}
+	logrus.Infof("333333333333")
 	r.logger.Infof("prepare app meta file success")
 	// read app meta config
 	files, _ := ioutil.ReadDir(r.homeDir)
 	if len(files) < 1 {
 		return nil, fmt.Errorf("Failed to read files in tmp dir %s", r.homeDir)
 	}
+	logrus.Infof("44444444444")
 	metaFile, err := os.Open(path.Join(r.homeDir, files[0].Name(), "metadata.json"))
 	if err != nil {
 		return nil, fmt.Errorf("Failed to read files in tmp dir %s: %v", r.homeDir, err)
 	}
+	logrus.Infof("55555555555")
 	defer metaFile.Close()
 	var ram v1alpha1.RainbondApplicationConfig
 	if err := json.NewDecoder(metaFile).Decode(&ram); err != nil {
 		return nil, fmt.Errorf("Failed to read meta file : %v", err)
 	}
+	logrus.Infof("666666666666")
 	// load all component images and plugin images
 	//after v5.3 package
 	l1, err := util.GetFileList(path.Join(r.homeDir, files[0].Name()), 1)
 	if err != nil {
 		return nil, err
 	}
+	logrus.Infof("777777777777")
 	//before v5.3 package
 	l2, err := util.GetFileList(path.Join(r.homeDir, files[0].Name()), 2)
 	if err != nil {
 		return nil, err
 	}
+	logrus.Infof("88888888888888")
 	allfiles := append(l1, l2...)
 	for _, f := range allfiles {
 		if strings.HasSuffix(f, ".tar") {
