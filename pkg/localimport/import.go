@@ -109,6 +109,7 @@ func (r *ramImport) Import(filePath string, hubInfo v1alpha1.ImageInfo) (*v1alph
 	}
 	allfiles := append(l1, l2...)
 	for _, f := range allfiles {
+		logrus.Infof("看看文件名称%v和长度%v", f, len(ram.Plugins))
 		if strings.HasPrefix(f, "plugins") && len(ram.Plugins) == 0 {
 			continue
 		}
