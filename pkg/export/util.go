@@ -188,3 +188,12 @@ func Packaging(packageName, homePath, exportPath string) (string, error) {
 	}
 	return packageName, nil
 }
+
+func PackagingBZip2(packageName, homePath, exportPath string) (string, error) {
+	cmd := exec.Command("tar", "-cjf", path.Join(homePath, packageName), path.Join(path.Base(exportPath), "*"))
+	cmd.Dir = homePath
+	if err := cmd.Run(); err != nil {
+		return "", err
+	}
+	return packageName, nil
+}
